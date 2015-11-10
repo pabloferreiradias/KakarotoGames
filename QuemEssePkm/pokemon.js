@@ -17,9 +17,11 @@ function create() {
     game.add.image(0, 0, 'bg');
     
     //Animação do sorteio
-    pokemon = game.add.sprite(565, 150, 'pokemon');
+    pokemon = game.add.sprite(545, 150, 'pokemon');
+    pokemon.scale.setTo(2, 2);
+    pokemon.tint = 0x000000;
     pokemon.animations.add('sortear');
-    pokemon.animations.play('sortear', 15, true);
+    pokemon.animations.play('sortear', 20, true);
        
     //Criando botões e nomes
     var larguraBox = game.cache.getImage('box').width;
@@ -56,17 +58,12 @@ function create() {
     }
     
     //Colocando Titulo
-    tituloX = 200;
-    tituloY = 50;
-    var bar = game.add.graphics();
-    bar.beginFill(0x000000, 0.2);
-    bar.drawRect(tituloX, tituloY, 800, 100);
-    var style = { font: "bold 32px Arial", fill: "#fff", boundsAlignH: "center", boundsAlignV: "middle" };
+    tituloX = 480;
+    tituloY = 10;
+    var style = { font: "bold 32px Arial", fill: "#fff", align: "center", boundsAlignH: "center", boundsAlignV: "middle" };
     //  The Text is positioned at 0, 100
-    titleText = game.add.text(tituloX, tituloY, "EU SEI MAIS DE POKEMON QUE VOCÊ!", style);
+    titleText = game.add.text(tituloX, tituloY, "EU SEI MAIS DE\nPOKEMON\nQUE VOCÊ!", style);
     titleText.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
-    //  We'll set the bounds to be from x0, y100 and be 800px wide by 100px high
-    titleText.setTextBounds(tituloX, tituloY, 400, 400);
     
 
 }
@@ -79,10 +76,16 @@ function iniciarSorteio() {
     pokemon.animations.play('sortear', 15, true);
 }
 
+function acertouBox (sprite) {
+    sprite.tint = 0x00ff00;
+}
+
+function errouBox (sprite) {
+    sprite.tint = 0xff0000;
+}
+
 function destroySprite (sprite) {
-
     sprite.destroy();
-
 }
 
 function getNome(i){
