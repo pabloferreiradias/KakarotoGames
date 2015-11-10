@@ -1,45 +1,244 @@
 var game = new Phaser.Game(1200, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create });
 
-function preload() {
+var pokemon;
+var acertos = new Array(151);
 
-    game.load.image('box', 'img/boxG.png');
+function preload() {
+    game.load.image('bg', 'img/deepblue.png');
+    game.load.image('box', 'img/boxRedN.png');
+    game.load.spritesheet('pokemon', 'img/pokemon.png', 66, 66, 151);
 
 }
 
 function create() {
-
-    var larguraBox = game.cache.getImage('box').width;
-    var alturaBox = game.cache.getImage('box').height;
-    
     LARGURA = game.world.width;
     ALTURA = game.world.height;
     
+    game.add.image(0, 0, 'bg');
+    
+    //Animação do sorteio
+    pokemon = game.add.sprite(565, 150, 'pokemon');
+    pokemon.animations.add('sortear');
+    pokemon.animations.play('sortear', 15, true);
+       
+    //Criando botões e nomes
+    var larguraBox = game.cache.getImage('box').width;
+    var alturaBox = game.cache.getImage('box').height;
     var espaco = 20;
     var coluna = 0;
     var linha = 0;
-    
     for (var i = 0; i < 151; i++){
-        var previsao = (linha * alturaBox) + espaco + alturaBox;
+        var previsao = (linha * alturaBox);
         if ( previsao > ALTURA ) {
             linha = 0;
             coluna++;
         }
-        
-        var box = game.add.sprite( (coluna * larguraBox) + espaco, (linha * alturaBox) + espaco, 'box');
-        
+        if (coluna > 3){
+            x = (coluna * larguraBox) + 310;
+        }else{
+            x = (coluna * larguraBox);
+        }
+        y = (linha * alturaBox);
+        var box = game.add.sprite( x, y, 'box');      
         box.name = i+1;
         box.inputEnabled = true;
         box.input.useHandCursor = true;
         box.events.onInputDown.add(destroySprite, this);
-        
+        var nomeEspc = 10;
+        if (i > 8) nomeEspc = 5;
+        if (i > 98) nomeEspc = 1;
+        nome = getNome(i);
+        text = game.add.text(x+nomeEspc, y+7, i+1 + " " + nome, {
+        font: "14px Arial",
+        fill: "#ffffff"
+               });
         linha++;
     }
     
+    //Colocando Titulo
+    tituloX = 200;
+    tituloY = 50;
+    var bar = game.add.graphics();
+    bar.beginFill(0x000000, 0.2);
+    bar.drawRect(tituloX, tituloY, 800, 100);
+    var style = { font: "bold 32px Arial", fill: "#fff", boundsAlignH: "center", boundsAlignV: "middle" };
+    //  The Text is positioned at 0, 100
+    titleText = game.add.text(tituloX, tituloY, "EU SEI MAIS DE POKEMON QUE VOCÊ!", style);
+    titleText.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
+    //  We'll set the bounds to be from x0, y100 and be 800px wide by 100px high
+    titleText.setTextBounds(tituloX, tituloY, 400, 400);
+    
 
+}
+
+function pararSorteio() {
+    pokemon.animations.stop();
+}
+
+function iniciarSorteio() {
+    pokemon.animations.play('sortear', 15, true);
 }
 
 function destroySprite (sprite) {
 
     sprite.destroy();
 
+}
+
+function getNome(i){
+    var nome = [
+    "Bulbasaur",
+    "Ivysaur",
+    "Venusaur",
+    "Charmander",
+    "Charmeleon",
+    "Charizard",
+    "Squirtle",
+    "Wartortle",
+    "Blastoise",
+    "Caterpie",
+    "Metapod",
+    "Butterfree",
+    "Weedle",
+    "Kakuna",
+    "Beedrill",
+    "Pidgey",
+    "Pidgeotto",
+    "Pidgeot",
+    "Rattata",
+    "Raticate",
+    "Spearow",
+    "Fearow",
+    "Ekans",
+    "Arbok",
+    "Pikachu",
+    "Raichu",
+    "Sandshrew",
+    "Sandslash",
+    "Nidoran",
+    "Nidorina",
+    "Nidoqueen",
+    "Nidoran",
+    "Nidorino",
+    "Nidoking",
+    "Clefairy",
+    "Clefable",
+    "Vulpix",
+    "Ninetales",
+    "Jigglypuff",
+    "Wigglytuff",
+    "Zubat",
+    "Golbat",
+    "Oddish",
+    "Gloom",
+    "Vileplume",
+    "Paras",
+    "Parasect",
+    "Venonat",
+    "Venomoth",
+    "Diglett",
+    "Dugtrio",
+    "Meowth",
+    "Persian",
+    "Psyduck",
+    "Golduck",
+    "Mankey",
+    "Primeape",
+    "Growlithe",
+    "Arcanine",
+    "Poliwag",
+    "Poliwhirl",
+    "Poliwrath",
+    "Abra",
+    "Kadabra",
+    "Alakazam",
+    "Machop",
+    "Machoke",
+    "Machamp",
+    "Bellsprout",
+    "Weepinbell",
+    "Victreebel",
+    "Tentacool",
+    "Tentacruel",
+    "Geodude",
+    "Graveler",
+    "Golem",
+    "Ponyta",
+    "Rapidash",
+    "Slowpoke",
+    "Slowbro",
+    "Magnemite",
+    "Magneton",
+    "Farfetch'd",
+    "Doduo",
+    "Dodrio",
+    "Seel",
+    "Dewgong",
+    "Grimer",
+    "Muk",
+    "Shellder",
+    "Cloyster",
+    "Gastly",
+    "Haunter",
+    "Gengar",
+    "Onix",
+    "Drowzee",
+    "Hypno",
+    "Krabby",
+    "Kingler",
+    "Voltorb",
+    "Electrode",
+    "Exeggcute",
+    "Exeggutor",
+    "Cubone",
+    "Marowak",
+    "Hitmonlee",
+    "Hitmonchan",
+    "Lickitung",
+    "Koffing",
+    "Weezing",
+    "Rhyhorn",
+    "Rhydon",
+    "Chansey",
+    "Tangela",
+    "Kangaskhan",
+    "Horsea",
+    "Seadra",
+    "Goldeen",
+    "Seaking",
+    "Staryu",
+    "Starmie",
+    "Mr. Mime",
+    "Scyther",
+    "Jynx",
+    "Electabuzz",
+    "Magmar",
+    "Pinsir",
+    "Tauros",
+    "Magikarp",
+    "Gyarados",
+    "Lapras",
+    "Ditto",
+    "Eevee",
+    "Vaporeon",
+    "Jolteon",
+    "Flareon",
+    "Porygon",
+    "Omanyte",
+    "Omastar",
+    "Kabuto",
+    "Kabutops",
+    "Aerodactyl",
+    "Snorlax",
+    "Articuno",
+    "Zapdos",
+    "Moltres",
+    "Dratini",
+    "Dragonair",
+    "Dragonite",
+    "Mewtwo",
+    "Mew"
+    ];
+    
+    return nome[i];
 }
