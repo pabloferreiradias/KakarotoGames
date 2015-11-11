@@ -1,7 +1,16 @@
-var game = new Phaser.Game(1200, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create });
+var game = new Phaser.Game(1200, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
 var pokemon;
 var acertos = new Array(151);
+var nAcertos = 0;
+var escolhido = false;
+var nEscolhido;
+
+var textStyle = { font: "32px Arial", align: 'center', fill: "#fff"};
+var timer;
+var milliseconds = 0;
+var seconds = 0;
+var minutes = 0;
 
 function preload() {
     game.load.image('bg', 'img/deepblue.png');
@@ -30,7 +39,7 @@ function create() {
     var coluna = 0;
     var linha = 0;
     for (var i = 0; i < 151; i++){
-        var previsao = (linha * alturaBox);
+        var previsao = (linha * alturaBox) + alturaBox;
         if ( previsao > ALTURA ) {
             linha = 0;
             coluna++;
@@ -42,10 +51,10 @@ function create() {
         }
         y = (linha * alturaBox);
         var box = game.add.sprite( x, y, 'box');      
-        box.name = i+1;
+        box.name = i;
         box.inputEnabled = true;
         box.input.useHandCursor = true;
-        box.events.onInputDown.add(destroySprite, this);
+        box.events.onInputDown.add(escolherPokemon, this);
         var nomeEspc = 10;
         if (i > 8) nomeEspc = 5;
         if (i > 98) nomeEspc = 1;
@@ -65,8 +74,64 @@ function create() {
     titleText = game.add.text(tituloX, tituloY, "EU SEI MAIS DE\nPOKEMON\nQUE VOCÊ!", style);
     titleText.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
     
+    timer = game.add.text(555, 300, '00:00:00', textStyle);
+    milliseconds = 0;
+    seconds = 0;
+    minutes = 0;
+    
+    sortearPokemon();
+    
 
 }
+
+function update() {
+    
+    updateTimer();
+    
+}
+
+function sortearPokemon(){
+    if (!escolhido){
+        nEscolhido = Math.floor(Math.random() * (151 - 1 + 1)) + 1;
+        while (acertos[nEscolhido] == 1){
+            nEscolhido = Math.floor(Math.random() * (151 - 1 + 1)) + 1;
+        }
+        pararSorteio();
+        sortearFrame(nEscolhido);
+        revelar();
+        escolhido = true;
+    }
+}
+
+function updateTimer() {
+
+   // minutes = Math.floor(game.time.time / 60000) % 60;
+    
+    minutes = Math.floor(this.game.time.totalElapsedSeconds() / 60);
+    
+    seconds = Math.floor(this.game.time.totalElapsedSeconds()) - (60 * minutes);
+    if (seconds < 10 ) seconds = '0'+seconds;
+    if (minutes < 10 ) minutes = '0'+minutes;
+    
+    //seconds = Math.floor(game.time.time / 1000) % 60;
+
+    //milliseconds = Math.floor(game.time.time) % 100;
+
+    //If any of the digits becomes a single digit number, pad it with a zero
+    //if (milliseconds < 10){
+    //milliseconds = '0' + milliseconds;
+    //}
+    //if (seconds < 10){
+    //seconds = '0' + seconds;
+    //}
+    //if (minutes < 10){
+    //minutes = '0' + minutes;
+    //}
+    //timer.setText(minutes + ':'+ seconds + ':' + milliseconds);
+    timer.setText(minutes + ':'+ seconds);
+
+}
+
 
 function pararSorteio() {
     pokemon.animations.stop();
@@ -76,16 +141,36 @@ function iniciarSorteio() {
     pokemon.animations.play('sortear', 15, true);
 }
 
+function sortearFrame(nEscolhido) {
+    pokemon.animations.frame = nEscolhido;
+}
+
+function revelar () {
+    pokemon.tint = 0xffffff;
+}
+
 function acertouBox (sprite) {
     sprite.tint = 0x00ff00;
+    acertos[sprite.name] = 1;
+    nAcertos++;
 }
 
 function errouBox (sprite) {
     sprite.tint = 0xff0000;
 }
 
-function destroySprite (sprite) {
-    sprite.destroy();
+function escolherPokemon (sprite) {
+    if(!escolhido) return;
+    
+    console.log(sprite.name + " - " + nEscolhido);
+    
+    if(sprite.name == nEscolhido){
+        acertouBox(sprite);
+    }else{
+        errouBox(sprite);
+    }
+    escolhido = false;
+    sortearPokemon();
 }
 
 function getNome(i){
