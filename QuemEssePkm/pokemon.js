@@ -153,6 +153,7 @@ function acertouBox (sprite) {
     sprite.tint = 0x00ff00;
     acertos[sprite.name] = 1;
     nAcertos++;
+    sprite.events.onInputDown.remove(escolherPokemon, this);
 }
 
 function errouBox (sprite) {
