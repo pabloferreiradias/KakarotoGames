@@ -16,12 +16,11 @@ function preload() {
     game.load.image('bg', 'img/deepblue.png');
     game.load.image('box', 'img/boxRedN.png');
     game.load.spritesheet('pokemon', 'img/pokemon.png', 66, 66, 151);
+    game.load.image('menu', 'img/menu.png', 270, 180);
 
 }
 
 function create() {
-    LARGURA = game.world.width;
-    ALTURA = game.world.height;
     
     game.add.image(0, 0, 'bg');
     
@@ -31,6 +30,9 @@ function create() {
     pokemon.tint = 0x000000;
     pokemon.animations.add('sortear');
     pokemon.animations.play('sortear', 20, true);
+    
+    var LARGURA = game.world.width;
+    var ALTURA = game.world.height;
        
     //Criando botões e nomes
     var larguraBox = game.cache.getImage('box').width;
@@ -88,6 +90,10 @@ function update() {
     
     updateTimer();
     
+    if (nAcertos >= 1){
+        fimJogo();
+    }
+    
 }
 
 function sortearPokemon(){
@@ -104,30 +110,14 @@ function sortearPokemon(){
 }
 
 function updateTimer() {
-
-   // minutes = Math.floor(game.time.time / 60000) % 60;
     
     minutes = Math.floor(this.game.time.totalElapsedSeconds() / 60);
     
     seconds = Math.floor(this.game.time.totalElapsedSeconds()) - (60 * minutes);
+    
     if (seconds < 10 ) seconds = '0'+seconds;
     if (minutes < 10 ) minutes = '0'+minutes;
     
-    //seconds = Math.floor(game.time.time / 1000) % 60;
-
-    //milliseconds = Math.floor(game.time.time) % 100;
-
-    //If any of the digits becomes a single digit number, pad it with a zero
-    //if (milliseconds < 10){
-    //milliseconds = '0' + milliseconds;
-    //}
-    //if (seconds < 10){
-    //seconds = '0' + seconds;
-    //}
-    //if (minutes < 10){
-    //minutes = '0' + minutes;
-    //}
-    //timer.setText(minutes + ':'+ seconds + ':' + milliseconds);
     timer.setText(minutes + ':'+ seconds);
 
 }
@@ -163,8 +153,6 @@ function errouBox (sprite) {
 function escolherPokemon (sprite) {
     if(!escolhido) return;
     
-    console.log(sprite.name + " - " + nEscolhido);
-    
     if(sprite.name == nEscolhido){
         acertouBox(sprite);
     }else{
@@ -172,6 +160,45 @@ function escolherPokemon (sprite) {
     }
     escolhido = false;
     sortearPokemon();
+}
+
+function fimJogo(){
+    var LARGURA = game.world.width;
+    var ALTURA = game.world.height;
+    
+    game.paused = true;
+    
+    var tempoTotal = Math.floor(this.game.time.totalElapsedSeconds());
+    
+    var topScores = scoreBoard(tempoTotal);
+    
+    console.log(topScores);
+    
+     // Then add the menu
+     menu = game.add.sprite(LARGURA/2, ALTURA/2, 'menu');
+     menu.anchor.setTo(0.5, 0.5);
+
+     choiseLabel = game.add.text(LARGURA/2, ALTURA-50, topScores, { font: '30px Arial', fill: '#fff' });
+     choiseLabel.anchor.setTo(0.5, 0.5);
+}
+
+function scoreBoard(tempoTotal){
+    var topScores;
+        if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+        } else {
+            // code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                topScores = xmlhttp.responseText;
+            }
+        };
+    xmlhttp.open("GET","score.php?time="+tempoTotal+"&user=pablo",true);
+    xmlhttp.send();
+    return topScores;
 }
 
 function getNome(i){
